@@ -46,10 +46,8 @@ public class CommandLauncherForceSandboxTest {
 
     @Test
     public void newCommandLauncher() throws Exception {
-        try (ACLContext ctx = ACL.as(User.getById("admin", true))) {
-            //With forceSandbox enabled, nonadmin users should not create agents with Launcher = CommandLauncher
-            ScriptApproval.get().setForceSandbox(true);
-        }
+        //With forceSandbox enabled, nonadmin users should not create agents with Launcher = CommandLauncher
+        ScriptApproval.get().setForceSandbox(true);
 
         try (ACLContext ctx = ACL.as(User.getById("devel", true))) {
             Descriptor.FormException ex = assertThrows(Descriptor.FormException.class, () ->
@@ -60,10 +58,8 @@ public class CommandLauncherForceSandboxTest {
                          ex.getMessage());
         }
 
-        try (ACLContext ctx = ACL.as(User.getById("admin", true))) {
-            //With forceSandbox disabled, nonadmin users can create agents with Launcher = CommandLauncher
-            ScriptApproval.get().setForceSandbox(false);
-        }
+        //With forceSandbox disabled, nonadmin users can create agents with Launcher = CommandLauncher
+        ScriptApproval.get().setForceSandbox(false);
 
         try (ACLContext ctx = ACL.as(User.getById("devel", true))) {
             new DumbSlave("s", "/", new CommandLauncher("echo unconfigured"));
