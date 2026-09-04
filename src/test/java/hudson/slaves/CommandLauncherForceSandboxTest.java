@@ -46,18 +46,22 @@ public class CommandLauncherForceSandboxTest {
 
     @Test
     public void newCommandLauncher() throws Exception {
+        //With forceSandbox enabled, nonadmin users should not create agents with Launcher = CommandLauncher
+        ScriptApproval.get().setForceSandbox(true);
+
         try (ACLContext ctx = ACL.as(User.getById("devel", true))) {
-            //With forceSandbox enabled, nonadmin users should not create agents with Launcher = CommandLauncher
-            ScriptApproval.get().setForceSandbox(true);
             Descriptor.FormException ex = assertThrows(Descriptor.FormException.class, () ->
                     new DumbSlave("s", "/",new CommandLauncher("echo unconfigured")));
 
             assertEquals("This Launch Method requires scripts executions out of the sandbox."
                          + " This Jenkins instance has been configured to not allow regular users to disable the sandbox",
                          ex.getMessage());
+        }
 
-            //With forceSandbox disabled, nonadmin users can create agents with Launcher = CommandLauncher
-            ScriptApproval.get().setForceSandbox(false);
+        //With forceSandbox disabled, nonadmin users can create agents with Launcher = CommandLauncher
+        ScriptApproval.get().setForceSandbox(false);
+
+        try (ACLContext ctx = ACL.as(User.getById("devel", true))) {
             new DumbSlave("s", "/", new CommandLauncher("echo unconfigured"));
         }
 
